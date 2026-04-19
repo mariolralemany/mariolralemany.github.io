@@ -79,6 +79,12 @@
       "link": "https://github.com/apricotweave91483/all/tree/main/transpiler"
     },
     {
+      "title": "video-decomp",
+      "description": "Video decomposition tool that factorizes grayscale frames with truncated SVD, stores reduced factors on disk, and reconstructs the video output.",
+      "tech": "Python + NumPy + OpenCV + tqdm",
+      "link": "https://github.com/apricotweave91483/all/tree/main/video-decomp"
+    },
+    {
       "title": "ttlx",
       "description": "CLI utility that sends file content plus prompt instructions to Groq and writes generated LaTeX output (`.tex`) files.",
       "tech": "Python + Groq API",
