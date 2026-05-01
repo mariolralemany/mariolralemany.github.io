@@ -34,7 +34,7 @@ body {
   min-height: 100vh;
   font-family: "Source Code Pro", monospace;
   font-weight: 300;
-  font-size: 12pt;
+  font-size: 10pt;
   line-height: 1.6;
   color: var(--text);
   background: var(--bg);
