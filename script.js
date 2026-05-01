@@ -1,9 +1,11 @@
 const treeLeaves = [...document.querySelectorAll(".tree-leaf")];
-const folderToggles = [...document.querySelectorAll(".tree-toggle")];
 const panels = [...document.querySelectorAll(".panel")];
 const landing = document.getElementById("landing");
 const homeTrigger = document.getElementById("home-trigger");
-const projectShuffleButton = document.getElementById("projects-shuffle");
+const projectShuffleButton = document.getElementById("portfolio-shuffle");
+const tabAliases = {
+  projects: "portfolio",
+};
 let projects = [];
 
 function updateUrlWithoutScroll(tabName = "") {
@@ -13,46 +15,28 @@ function updateUrlWithoutScroll(tabName = "") {
 }
 
 function activateTab(tabName = "") {
-  const isKnownTab = panels.some((panel) => panel.id === tabName);
+  const normalizedTab = tabAliases[tabName] || tabName;
+  const isKnownTab = panels.some((panel) => panel.id === normalizedTab);
 
   treeLeaves.forEach((leaf) => {
-    const isActive = isKnownTab && leaf.dataset.tab === tabName;
+    const isActive = isKnownTab && leaf.dataset.tab === normalizedTab;
     leaf.classList.toggle("active", isActive);
     leaf.setAttribute("aria-selected", String(isActive));
   });
 
   panels.forEach((panel) => {
-    panel.classList.toggle("active", isKnownTab && panel.id === tabName);
+    panel.classList.toggle("active", isKnownTab && panel.id === normalizedTab);
   });
 
   landing.classList.toggle("active", !isKnownTab);
 
   if (isKnownTab) {
-    updateUrlWithoutScroll(tabName);
+    updateUrlWithoutScroll(normalizedTab);
     return;
   }
 
   updateUrlWithoutScroll();
 }
-
-function setFolderState(toggle, isExpanded) {
-  const groupId = toggle.getAttribute("aria-controls");
-  const group = document.getElementById(groupId);
-  if (!group) return;
-
-  toggle.setAttribute("aria-expanded", String(isExpanded));
-  group.hidden = !isExpanded;
-}
-
-folderToggles.forEach((toggle) => {
-  const isInitiallyExpanded = toggle.getAttribute("aria-expanded") === "true";
-  setFolderState(toggle, isInitiallyExpanded);
-
-  toggle.addEventListener("click", () => {
-    const isExpanded = toggle.getAttribute("aria-expanded") === "true";
-    setFolderState(toggle, !isExpanded);
-  });
-});
 
 treeLeaves.forEach((leaf) => {
   leaf.addEventListener("click", () => {
@@ -65,18 +49,6 @@ if (homeTrigger) {
   homeTrigger.addEventListener("click", () => {
     activateTab("");
   });
-}
-
-function expandParentFolders(leaf) {
-  let parentGroup = leaf.closest(".tree-group");
-
-  while (parentGroup) {
-    const toggle = document.querySelector(`.tree-toggle[aria-controls="${parentGroup.id}"]`);
-    if (toggle) setFolderState(toggle, true);
-
-    const parentItem = parentGroup.parentElement.closest(".tree-item");
-    parentGroup = parentItem ? parentItem.closest(".tree-group") : null;
-  }
 }
 
 function renderProjects(listId, items) {
@@ -250,9 +222,9 @@ async function loadProjects() {
     }
 
     projects = shuffleItems(projectList);
-    renderProjects("projects-list", projects);
+    renderProjects("portfolio-list", projects);
   } catch (error) {
-    const list = document.getElementById("projects-list");
+    const list = document.getElementById("portfolio-list");
     if (list) {
       list.innerHTML = `
         <article class="card">
@@ -268,7 +240,7 @@ if (projectShuffleButton) {
   projectShuffleButton.addEventListener("click", () => {
     if (!projects.length) return;
     projects = shuffleItems(projects);
-    renderProjects("projects-list", projects);
+    renderProjects("portfolio-list", projects);
   });
 }
 
@@ -319,8 +291,4 @@ loadBio();
 initCoverDeck();
 
 const initialTab = window.location.hash.replace("#", "");
-const initialLeaf = treeLeaves.find((leaf) => leaf.dataset.tab === initialTab);
-if (initialLeaf) {
-  expandParentFolders(initialLeaf);
-}
 activateTab(initialTab);

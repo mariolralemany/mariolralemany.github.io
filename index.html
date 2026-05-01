@@ -21,24 +21,13 @@
         <nav class="tree-nav" aria-label="Site sections">
           <ul class="tree-root">
             <li class="tree-item">
-              <div class="tree-row">
-                <button class="tree-toggle tree-folder-toggle" aria-expanded="false" aria-controls="work-group">
-                  <span class="arrow" aria-hidden="true"></span>
-                  <span class="tree-folder-label"
-                    ><span class="folder-name">work</span><span class="folder-slash">/</span></span>
-                </button>
-              </div>
-              <ul class="tree-group" id="work-group">
-                <li class="tree-item">
-                  <button class="tree-leaf" data-tab="projects" aria-selected="false">projects</button>
-                </li>
-                <li class="tree-item">
-                  <button class="tree-leaf" data-tab="accounts" aria-selected="false">accounts</button>
-                </li>
-              </ul>
+              <button class="tree-leaf" data-tab="portfolio" aria-selected="false" type="button">portfolio</button>
             </li>
             <li class="tree-item">
-              <button class="tree-leaf tree-leaf-standalone" data-tab="about" aria-selected="false">about</button>
+              <button class="tree-leaf" data-tab="accounts" aria-selected="false" type="button">accounts</button>
+            </li>
+            <li class="tree-item">
+              <button class="tree-leaf" data-tab="about" aria-selected="false" type="button">about</button>
             </li>
           </ul>
         </nav>
@@ -57,12 +46,12 @@
           </div>
         </section>
 
-        <section class="panel" id="projects">
+        <section class="panel" id="portfolio">
           <div class="section-head">
-            <h2>Projects</h2>
-            <button class="shuffle-button" id="projects-shuffle" type="button">shuffle</button>
+            <h2></h2>
+            <button class="shuffle-button" id="portfolio-shuffle" type="button">shuffle</button>
           </div>
-          <div id="projects-list" class="projects-grid"></div>
+          <div id="portfolio-list" class="projects-grid"></div>
         </section>
 
         <section class="panel" id="accounts">

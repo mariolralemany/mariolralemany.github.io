@@ -86,22 +86,16 @@ body {
   color: var(--neon-2);
 }
 
-.tree-root,
-.tree-group {
+.tree-root {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.tree-group {
-  margin-left: 1rem;
+.tree-item + .tree-item {
+  margin-top: 0.08rem;
 }
 
-.tree-row {
-  display: flex;
-}
-
-.tree-toggle,
 .tree-leaf {
   appearance: none;
   border: 0;
@@ -115,58 +109,9 @@ body {
   border-radius: 6px;
 }
 
-.tree-toggle {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.tree-folder-toggle {
-  text-transform: none;
-  letter-spacing: 0.02em;
-}
-
-.tree-folder-label {
-  font-variant-numeric: tabular-nums;
-}
-
-.folder-name {
-  color: var(--muted);
-}
-
-.folder-slash {
-  color: rgba(140, 175, 200, 0.55);
-  margin-left: 0.02em;
-}
-
-.tree-toggle:hover,
 .tree-leaf:hover {
   color: var(--neon-2);
   background: rgba(91, 184, 235, 0.1);
-}
-
-.arrow {
-  display: inline-block;
-  width: 0;
-  height: 0;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 7px solid var(--muted);
-  margin-right: 0.5rem;
-  transition: transform 0.16s ease;
-  transform-origin: 35% 50%;
-}
-
-.tree-toggle[aria-expanded="true"] .arrow {
-  transform: rotate(90deg);
-  border-left-color: var(--neon);
-}
-
-.tree-leaf {
-  padding-left: 0.3rem;
-}
-
-.tree-leaf-standalone {
-  margin-top: 0.45rem;
 }
 
 .tree-leaf.active {
@@ -303,14 +248,14 @@ body {
 }
 
 /* Projects grid */
-#projects-list.projects-grid {
+#portfolio-list.projects-grid {
   margin-top: 0.9rem;
   display: grid;
   gap: 0.8rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-#projects-list.projects-grid .card {
+#portfolio-list.projects-grid .card {
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -319,19 +264,19 @@ body {
   height: 100%;
 }
 
-#projects-list.projects-grid .card .project-link {
+#portfolio-list.projects-grid .card .project-link {
   margin-top: auto;
   padding-top: 0.65rem;
 }
 
 @media (max-width: 900px) {
-  #projects-list.projects-grid {
+  #portfolio-list.projects-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 560px) {
-  #projects-list.projects-grid {
+  #portfolio-list.projects-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -414,14 +359,7 @@ body {
 
   .sidebar {
     position: static;
-  }
-
-  .sidebar {
     padding: 0;
-  }
-
-  .tree-group {
-    margin-left: 0.8rem;
   }
 }
 
