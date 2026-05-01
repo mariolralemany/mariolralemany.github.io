@@ -388,6 +388,15 @@ body {
   color: var(--muted);
 }
 
+.section-head {
+  display: flex;
+  align-items: center;
+}
+
+.section-head .shuffle-button {
+  margin-left: auto;
+}
+
 .shuffle-button {
   --shiny-cta-bg: #04070e;
   --shiny-cta-bg-subtle: rgba(91, 184, 235, 0.18);
@@ -409,7 +418,9 @@ body {
   border: 0;
   border-radius: 999px;
   color: var(--shiny-cta-fg);
-  background: linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg)) padding-box;
+  background: rgba(91, 184, 235, 0.14);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   box-shadow: none;
   cursor: pointer;
   transition: var(--transition);
