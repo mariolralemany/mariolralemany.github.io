@@ -29,6 +29,30 @@
   box-sizing: border-box;
 }
 
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-percent {
+  syntax: "<percentage>";
+  initial-value: 5%;
+  inherits: false;
+}
+
+@property --gradient-shine {
+  syntax: "<color>";
+  initial-value: white;
+  inherits: false;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -86,37 +110,177 @@ body {
   color: var(--neon-2);
 }
 
-.tree-root {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.fluid-nav {
+  min-height: 260px;
 }
 
-.tree-item + .tree-item {
-  margin-top: 0.08rem;
+.fluid-menu {
+  --menu-size: 56px;
+  --menu-step: 58px;
+  position: relative;
+  width: var(--menu-size);
 }
 
-.tree-leaf {
+.fluid-menu-button {
+  --trace-angle: 0deg;
   appearance: none;
   border: 0;
-  background: transparent;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  width: var(--menu-size);
+  height: var(--menu-size);
+  display: grid;
+  place-items: center;
   color: var(--muted);
-  font: inherit;
-  width: 100%;
-  padding: 0.34rem 0.2rem;
-  text-align: left;
+  background: transparent;
+  border-radius: 999px;
   cursor: pointer;
-  border-radius: 6px;
+  box-shadow: none;
+  transition:
+    color 0.2s ease-out,
+    background 0.2s ease-out,
+    transform 0.2s ease-out;
 }
 
-.tree-leaf:hover {
+.fluid-menu-button:hover {
+  color: var(--accent-soft);
+  background: transparent;
+  transform: scale(1.04);
+}
+
+.fluid-menu-button.active {
   color: var(--neon-2);
-  background: rgba(91, 184, 235, 0.1);
+  background: transparent;
 }
 
-.tree-leaf.active {
-  color: var(--neon);
-  background: rgba(91, 184, 235, 0.14);
+.fluid-menu-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from var(--trace-angle),
+    transparent 0deg,
+    transparent 267deg,
+    rgba(196, 235, 255, 0.15) 305deg,
+    var(--accent-soft) 334deg,
+    transparent 360deg
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.fluid-menu-button:hover::before {
+  opacity: 1;
+}
+
+.fluid-icon {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.fluid-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-width 0.18s ease-out;
+}
+
+.fluid-menu-button:hover .fluid-icon svg,
+.fluid-menu-button.active .fluid-icon svg {
+  stroke-width: 2.15;
+}
+
+.fluid-menu-toggle {
+  position: relative;
+  z-index: 50;
+}
+
+.fluid-menu-toggle .fluid-icon {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 0.28s ease-out,
+    transform 0.28s ease-out;
+}
+
+.fluid-icon-close {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+}
+
+.fluid-menu[data-expanded="true"] .fluid-icon-menu {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0) rotate(180deg);
+}
+
+.fluid-menu[data-expanded="true"] .fluid-icon-close {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotate(0deg);
+}
+
+.fluid-menu-items {
+  position: absolute;
+  inset: 0 auto auto 0;
+}
+
+.fluid-menu-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(0) scale(0.92);
+  pointer-events: none;
+  transition:
+    opacity 0.26s ease-out,
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.fluid-menu-item:nth-child(1) {
+  z-index: 43;
+}
+
+.fluid-menu-item:nth-child(2) {
+  z-index: 42;
+}
+
+.fluid-menu-item:nth-child(3) {
+  z-index: 41;
+}
+
+.fluid-menu[data-expanded="true"] .fluid-menu-item {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(calc((var(--item-index) + 1) * var(--menu-step))) scale(1);
+}
+
+.fluid-menu-item:nth-child(1) {
+  --item-index: 0;
+}
+
+.fluid-menu-item:nth-child(2) {
+  --item-index: 1;
+}
+
+.fluid-menu-item:nth-child(3) {
+  --item-index: 2;
 }
 
 .content-area {
@@ -225,19 +389,119 @@ body {
 }
 
 .shuffle-button {
+  --shiny-cta-bg: #04070e;
+  --shiny-cta-bg-subtle: rgba(91, 184, 235, 0.18);
+  --shiny-cta-fg: var(--accent-soft);
+  --shiny-cta-highlight: var(--neon);
+  --shiny-cta-highlight-subtle: var(--neon-2);
+  --animation: gradient-angle linear infinite;
+  --duration: 3s;
+  --shadow-size: 2px;
+  --transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: transparent;
-  color: var(--muted);
-  padding: 0.22rem 0.55rem;
-  border-radius: 6px;
+  outline-offset: 4px;
+  padding: 0.42rem 0.92rem;
   font: inherit;
+  line-height: 1.2;
+  border: 1px solid rgba(159, 212, 245, 0.35);
+  border-radius: 999px;
+  color: var(--shiny-cta-fg);
+  background: linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg)) padding-box;
+  box-shadow: inset 0 0 0 1px var(--shiny-cta-bg-subtle);
   cursor: pointer;
+  transition: var(--transition);
+  transition-property: --gradient-angle-offset, --gradient-percent, --gradient-shine, color;
 }
 
-.shuffle-button:hover {
+.shuffle-button::before,
+.shuffle-button::after,
+.shuffle-button span::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  z-index: -1;
+}
+
+.shuffle-button:active {
+  translate: 0 1px;
+}
+
+.shuffle-button::before {
+  --size: calc(100% - var(--shadow-size) * 3);
+  --position: 2px;
+  --space: calc(var(--position) * 2);
+  width: var(--size);
+  height: var(--size);
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--position) var(--position),
+    rgba(255, 255, 255, 0.9) calc(var(--position) / 4),
+    transparent 0
+  ) padding-box;
+  background-size: var(--space) var(--space);
+  background-repeat: space;
+  mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  opacity: 0.34;
+}
+
+.shuffle-button::after {
+  --animation: shimmer linear infinite;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(-50deg, transparent, var(--shiny-cta-highlight), transparent);
+  mask-image: radial-gradient(circle at bottom, transparent 42%, black);
+  opacity: 0;
+  transition: opacity var(--transition);
+  display: none;
+}
+
+.shuffle-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.shuffle-button span::before {
+  --size: calc(100% + 1rem);
+  width: var(--size);
+  height: var(--size);
+  box-shadow: inset 0 -1ex 2rem 4px var(--shiny-cta-highlight);
+  opacity: 0;
+  transition: opacity var(--transition);
+  animation: calc(var(--duration) * 1.5) breathe linear infinite;
+}
+
+.shuffle-button::before,
+.shuffle-button::after {
+  animation:
+    var(--animation) var(--duration),
+    var(--animation) calc(var(--duration) / 0.4) reverse paused;
+  animation-composition: add;
+}
+
+.shuffle-button:is(:hover, :focus-visible) {
   color: var(--text);
-  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.shuffle-button:is(:hover, :focus-visible),
+.shuffle-button:is(:hover, :focus-visible)::before,
+.shuffle-button:is(:hover, :focus-visible)::after {
+  animation-play-state: running;
+}
+
+.shuffle-button:is(:hover, :focus-visible) span::before {
+  opacity: 0;
 }
 
 .card-grid {
@@ -251,7 +515,7 @@ body {
 #portfolio-list.projects-grid {
   margin-top: 0.9rem;
   display: grid;
-  gap: 0.8rem;
+  gap: 1rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -318,6 +582,67 @@ body {
   background: var(--surface);
 }
 
+.project-card {
+  --trace-angle: 0deg;
+  position: relative;
+  min-height: 210px;
+  overflow: hidden;
+  isolation: isolate;
+  border-color: rgba(159, 212, 245, 0.28);
+  background: var(--surface);
+  box-shadow:
+    0 14px 38px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.18s ease-out,
+    border-color 0.2s ease-out,
+    box-shadow 0.2s ease-out;
+  will-change: transform;
+}
+
+.project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from var(--trace-angle),
+    transparent 0deg,
+    transparent 267deg,
+    rgba(196, 235, 255, 0.15) 305deg,
+    var(--accent-soft) 334deg,
+    transparent 360deg
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.project-card:hover {
+  border-color: rgba(159, 212, 245, 0.18);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  transform: scale(1.025);
+}
+
+.project-card:hover::before {
+  opacity: 1;
+}
+
+.project-card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .card h3 {
   margin: 0 0 0.45rem;
   color: var(--accent-soft);
@@ -340,6 +665,11 @@ body {
 
 .project-link:hover {
   color: var(--text);
+}
+
+.project-card .project-link {
+  position: relative;
+  z-index: 3;
 }
 
 .tag {
@@ -387,5 +717,46 @@ body {
   .landing-stack--deck .stack-photo.depth-2 {
     top: 7%;
     left: 8.5%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card {
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    transform: none !important;
+  }
+
+  .project-card:hover::before {
+    opacity: 0;
+  }
+
+  .shuffle-button,
+  .shuffle-button::before,
+  .shuffle-button::after,
+  .shuffle-button span::before {
+    animation: none;
+  }
+}
+
+@keyframes gradient-angle {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes breathe {
+  from,
+  to {
+    scale: 1;
+  }
+
+  50% {
+    scale: 1.2;
   }
 }

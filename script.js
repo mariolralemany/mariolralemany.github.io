@@ -2,11 +2,22 @@ const treeLeaves = [...document.querySelectorAll(".tree-leaf")];
 const panels = [...document.querySelectorAll(".panel")];
 const landing = document.getElementById("landing");
 const homeTrigger = document.getElementById("home-trigger");
+const fluidMenu = document.getElementById("fluid-menu");
+const fluidMenuToggle = document.getElementById("fluid-menu-toggle");
 const projectShuffleButton = document.getElementById("portfolio-shuffle");
 const tabAliases = {
   projects: "portfolio",
 };
 let projects = [];
+const borderTraceConfig = {
+  duration: 2625,
+  cornerSlowdown: 0.5,
+  cornerSlowdownRange: 24,
+};
+let borderTraceAngle = Math.random() * 360;
+let borderTraceFrame = null;
+let borderTraceLastTime = 0;
+let borderTraceActiveCard = null;
 
 function updateUrlWithoutScroll(tabName = "") {
   const { pathname, search } = window.location;
@@ -51,6 +62,14 @@ if (homeTrigger) {
   });
 }
 
+if (fluidMenu && fluidMenuToggle) {
+  fluidMenuToggle.addEventListener("click", () => {
+    const isExpanded = fluidMenu.dataset.expanded === "true";
+    fluidMenu.dataset.expanded = String(!isExpanded);
+    fluidMenuToggle.setAttribute("aria-expanded", String(!isExpanded));
+  });
+}
+
 function renderProjects(listId, items) {
   const list = document.getElementById(listId);
   if (!list) return;
@@ -74,15 +93,115 @@ function renderProjects(listId, items) {
           : `<a class="project-link" href="${link}" target="_blank" rel="noopener noreferrer">visit</a>`;
 
       return `
-      <article class="card">
-        <h3>${escapeHtml(project.title || "Untitled Project")}</h3>
-        <p class="meta">${escapeHtml(project.description || "")}</p>
-        <p class="project-tech">${escapeHtml(project.tech || "")}</p>
-        ${linkMarkup}
+      <article class="card project-card">
+        <div class="project-card-content">
+          <h3>${escapeHtml(project.title || "Untitled Project")}</h3>
+          <p class="meta">${escapeHtml(project.description || "")}</p>
+          <p class="project-tech">${escapeHtml(project.tech || "")}</p>
+          ${linkMarkup}
+        </div>
       </article>
     `;
     })
     .join("");
+
+  initProjectBorderTrace(list);
+}
+
+function initProjectBorderTrace(root = document) {
+  const cards = [...root.querySelectorAll(".project-card")];
+
+  cards.forEach((card) => {
+    if (card.dataset.traceBound === "true") return;
+    card.dataset.traceBound = "true";
+    card.style.setProperty("--trace-angle", `${borderTraceAngle}deg`);
+
+    card.addEventListener("pointerenter", () => {
+      borderTraceActiveCard = card;
+      card.style.setProperty("--trace-angle", `${borderTraceAngle}deg`);
+      startProjectBorderTrace();
+    });
+
+    card.addEventListener("pointerleave", () => {
+      stopProjectBorderTrace();
+      borderTraceActiveCard = null;
+    });
+
+    card.addEventListener("pointercancel", () => {
+      stopProjectBorderTrace();
+      borderTraceActiveCard = null;
+    });
+  });
+}
+
+function initNavBorderTrace() {
+  const buttons = [...document.querySelectorAll(".fluid-menu-button")];
+
+  buttons.forEach((button) => {
+    if (button.dataset.traceBound === "true") return;
+    button.dataset.traceBound = "true";
+    button.style.setProperty("--trace-angle", `${borderTraceAngle}deg`);
+
+    button.addEventListener("pointerenter", () => {
+      borderTraceActiveCard = button;
+      button.style.setProperty("--trace-angle", `${borderTraceAngle}deg`);
+      startProjectBorderTrace();
+    });
+
+    button.addEventListener("pointerleave", () => {
+      stopProjectBorderTrace();
+      borderTraceActiveCard = null;
+    });
+
+    button.addEventListener("pointercancel", () => {
+      stopProjectBorderTrace();
+      borderTraceActiveCard = null;
+    });
+  });
+}
+
+function startProjectBorderTrace() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (borderTraceFrame !== null) return;
+
+  borderTraceLastTime = performance.now();
+  borderTraceFrame = requestAnimationFrame(updateProjectBorderTrace);
+}
+
+function updateProjectBorderTrace(time) {
+  if (!borderTraceActiveCard) {
+    borderTraceFrame = null;
+    return;
+  }
+
+  const elapsed = time - borderTraceLastTime;
+  borderTraceLastTime = time;
+  const speedMultiplier = getBorderTraceSpeedMultiplier(borderTraceAngle);
+  borderTraceAngle =
+    (borderTraceAngle + (elapsed / borderTraceConfig.duration) * 360 * speedMultiplier) % 360;
+  borderTraceActiveCard.style.setProperty("--trace-angle", `${borderTraceAngle}deg`);
+  borderTraceFrame = requestAnimationFrame(updateProjectBorderTrace);
+}
+
+function stopProjectBorderTrace() {
+  if (borderTraceFrame === null) return;
+
+  cancelAnimationFrame(borderTraceFrame);
+  borderTraceFrame = null;
+}
+
+function getBorderTraceSpeedMultiplier(angle) {
+  const corners = [45, 135, 225, 315];
+  const nearestCornerDistance = Math.min(
+    ...corners.map((corner) => {
+      const distance = Math.abs((((angle - corner + 180) % 360) + 360) % 360 - 180);
+      return distance;
+    })
+  );
+  const cornerAmount = 1 - Math.min(nearestCornerDistance / borderTraceConfig.cornerSlowdownRange, 1);
+  const easedCornerAmount = cornerAmount * cornerAmount * (3 - 2 * cornerAmount);
+
+  return 1 - (1 - borderTraceConfig.cornerSlowdown) * easedCornerAmount;
 }
 
 function escapeHtml(value) {
@@ -289,6 +408,7 @@ loadProjects();
 loadAccounts();
 loadBio();
 initCoverDeck();
+initNavBorderTrace();
 
 const initialTab = window.location.hash.replace("#", "");
 activateTab(initialTab);
