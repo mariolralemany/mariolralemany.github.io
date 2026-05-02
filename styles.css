@@ -64,6 +64,11 @@ body {
   background: var(--bg);
 }
 
+body.landing-mode {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .app-layout {
   width: min(1240px, 94vw);
   margin: 2rem auto;

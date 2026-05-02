@@ -28,6 +28,7 @@ function updateUrlWithoutScroll(tabName = "") {
 function activateTab(tabName = "") {
   const normalizedTab = tabAliases[tabName] || tabName;
   const isKnownTab = panels.some((panel) => panel.id === normalizedTab);
+  const isLanding = !isKnownTab;
 
   treeLeaves.forEach((leaf) => {
     const isActive = isKnownTab && leaf.dataset.tab === normalizedTab;
@@ -39,7 +40,8 @@ function activateTab(tabName = "") {
     panel.classList.toggle("active", isKnownTab && panel.id === normalizedTab);
   });
 
-  landing.classList.toggle("active", !isKnownTab);
+  landing.classList.toggle("active", isLanding);
+  document.body.classList.toggle("landing-mode", isLanding);
 
   if (isKnownTab) {
     updateUrlWithoutScroll(normalizedTab);
