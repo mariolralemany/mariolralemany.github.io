@@ -1,7 +1,9 @@
 {
   "accounts": {
-    "codeforces": "uneasywatermelon",
-    "github": "apricotweave91483",
-    "leetcode": "bartilious123456"
+    "Codeforces": "uneasywatermelon",
+    "Project Euler": "uneasywatermelon",
+    "GitHub": "apricotweave91483",
+    "LeetCode": "bartilious123456"
+    
   }
 }

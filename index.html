@@ -3,132 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mariolralemany</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400&display=swap"
-      rel="stylesheet"
-    />
+    <title>Mario Alemany</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-layout">
-      <aside class="sidebar">
-        <div class="brand-block">
-          <button class="brand-home" id="home-trigger" type="button">mario alemany</button>
-        </div>
-        <nav class="fluid-nav" aria-label="Site sections">
-          <div class="fluid-menu" id="fluid-menu" data-expanded="false">
-            <button
-              class="fluid-menu-button fluid-menu-toggle"
-              id="fluid-menu-toggle"
-              type="button"
-              aria-label="Toggle navigation"
-              aria-expanded="false"
-              aria-controls="fluid-menu-items"
-            >
-              <span class="fluid-icon fluid-icon-menu" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </svg>
-              </span>
-              <span class="fluid-icon fluid-icon-close" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M6 6l12 12" />
-                  <path d="M18 6L6 18" />
-                </svg>
-              </span>
-            </button>
-
-            <div class="fluid-menu-items" id="fluid-menu-items">
-              <button
-                class="fluid-menu-button fluid-menu-item tree-leaf"
-                data-tab="portfolio"
-                aria-selected="false"
-                type="button"
-                aria-label="Portfolio"
-              >
-                <span class="fluid-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 7.5h16v11H4z" />
-                    <path d="M9 7.5V5.5h6v2" />
-                    <path d="M4 12h16" />
-                  </svg>
-                </span>
-              </button>
-              <button
-                class="fluid-menu-button fluid-menu-item tree-leaf"
-                data-tab="accounts"
-                aria-selected="false"
-                type="button"
-                aria-label="Accounts"
-              >
-                <span class="fluid-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 6h16v12H4z" />
-                    <path d="M4 8l8 6 8-6" />
-                  </svg>
-                </span>
-              </button>
-              <button
-                class="fluid-menu-button fluid-menu-item tree-leaf"
-                data-tab="about"
-                aria-selected="false"
-                type="button"
-                aria-label="About"
-              >
-                <span class="fluid-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
-                  </svg>
-                </span>
-              </button>
-            </div>
-          </div>
-        </nav>
-      </aside>
-
-      <section class="content-area">
-        <section class="landing active" id="landing">
-          <div
-            class="landing-stack landing-stack--deck"
-            id="cover-deck"
-            aria-label="Featured portraits. Click a photo to cycle the stack."
-          >
-            <img src="img/cover1.jpeg" alt="Cover photo 1" class="stack-photo" data-cover="0" />
-            <img src="img/cover2.jpeg" alt="Cover photo 2" class="stack-photo" data-cover="1" />
-            <img src="img/cover3.jpeg" alt="Cover photo 3" class="stack-photo" data-cover="2" />
-          </div>
-        </section>
-
-        <section class="panel" id="portfolio">
-          <div class="section-head">
-            <h2></h2>
-            <button class="shuffle-button shiny-cta" id="portfolio-shuffle" type="button">
-              <span>shuffle</span>
-            </button>
-          </div>
-          <div id="portfolio-list" class="projects-grid"></div>
-        </section>
-
-        <section class="panel" id="accounts">
-          <div class="section-head">
-            <h2>Accounts</h2>
-          </div>
-          <div id="accounts-list" class="accounts-list"></div>
-        </section>
-
-        <section class="panel" id="about">
-          <h2>About</h2>
-          <div id="about-bio" class="about-bio"></div>
-        </section>
+    <main class="terminal-shell">
+      <pre class="ascii-name" id="ascii-name"></pre>
+      <section class="block">
+        <ul class="file-list">
+          <li><a href="content.html?view=about">About</a></li>
+          <li><a href="content.html?view=programming">Programming</a></li>
+          <li><a href="content.html?view=accounts">Accounts</a></li>
+        </ul>
       </section>
     </main>
-
     <script src="script.js"></script>
   </body>
 </html>
