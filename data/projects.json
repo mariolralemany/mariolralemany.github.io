@@ -2,91 +2,91 @@
   "projects": [
     {
       "title": "2048 Bot",
-      "description": "Automates play2048.co by reading board tiles from screen colors and choosing moves with expectimax (Python or compiled C strategy).",
+      "description": "Plays 2048 automatically by reading tile colors and picking expectimax moves (Python or compiled C strategy).",
       "tech": "Python + C + PyAutoGUI",
       "link": "https://github.com/apricotweave91483/all/tree/main/2048-bot"
     },
     {
       "title": "Local AI Coding Agent",
-      "description": "Self-hosted coding-agent CLI that talks to an OpenAI-compatible llama.cpp server and runs workspace tools with shell safety gates.",
+      "description": "Local coding-agent CLI that talks to a llama.cpp OpenAI-style server and runs workspace tools with shell safety checks.",
       "tech": "Python + llama.cpp/OpenAI API",
       "link": "https://github.com/apricotweave91483/all/tree/main/agent"
     },
     {
       "title": "ai_file",
-      "description": "Bash CLI wrapper around Ollama that auto-starts the local server and generates direct-to-file content from prompts.",
+      "description": "Bash wrapper for Ollama that auto-starts the local server and writes prompt output straight to files.",
       "tech": "Bash + Ollama",
       "link": "https://github.com/apricotweave91483/all/tree/main/ai_file"
     },
     {
       "title": "clink",
-      "description": "Command-line helper that injects reusable C comparator functions (e.g., qsort/bsearch int/long long comparators) into source files.",
+      "description": "CLI helper that drops reusable C comparator functions (like qsort/bsearch int or long long comparators) into source files.",
       "tech": "Python + C tooling",
       "link": "https://github.com/apricotweave91483/all/tree/main/clink"
     },
     {
       "title": "fetch",
-      "description": "Codeforces problem fetcher CLI with difficulty filtering, seen-list tracking, history, cache refresh, and optional browser opening.",
+      "description": "Codeforces problem fetcher with difficulty filters, seen/history tracking, cache refresh, and optional browser open.",
       "tech": "Bash + jq + Codeforces API",
       "link": "https://github.com/apricotweave91483/all/tree/main/fetch"
     },
     {
       "title": "Letter Boxed Solver",
-      "description": "Word-search solver for the Letter Boxed puzzle that filters a large dictionary and enumerates valid 2-word/3-word chains.",
+      "description": "Letter Boxed solver that filters a big dictionary and finds valid 2-word or 3-word chains.",
       "tech": "Python + wordlist data",
       "link": "https://github.com/apricotweave91483/all/tree/main/letter_boxed"
     },
     {
       "title": "Linear Algebra REPL Tool",
-      "description": "Custom exact-arithmetic linear algebra library/REPL with Fraction, Vector, Matrix, and System support plus row-reduction workflows.",
+      "description": "Exact-arithmetic linear algebra library/REPL with Fraction, Vector, Matrix, and System support plus row-reduction workflows.",
       "tech": "Python (custom algebra library)",
       "link": "https://github.com/apricotweave91483/all/tree/main/Linear_Algebra_Repl_Tool"
     },
     {
       "title": "mac_texter",
-      "description": "macOS desktop automation script that uses keyboard simulation to compose and send messages through the Messages app.",
+      "description": "macOS automation script that simulates typing to compose and send Messages app texts.",
       "tech": "Python + PyAutoGUI",
       "link": "https://github.com/apricotweave91483/all/tree/main/mac_texter"
     },
     {
       "title": "matrices.py",
-      "description": "Handwritten first-pass matrix solver implementing REF/RREF and solution interpretation for linear systems.",
+      "description": "Handwritten matrix solver for REF/RREF plus solution interpretation for linear systems.",
       "tech": "Python + NumPy + Fractions",
       "link": "https://github.com/apricotweave91483/all/tree/main/matrices"
     },
     {
       "title": "pomodoro",
-      "description": "Terminal Pomodoro timer that schedules work/break rounds and plays alert audio between transitions.",
+      "description": "Terminal Pomodoro timer that runs work/break rounds and plays alert audio between transitions.",
       "tech": "Python + subprocess audio playback",
       "link": "https://github.com/apricotweave91483/all/tree/main/pomodoro"
     },
     {
       "title": "problem_emailer",
-      "description": "Suite of scripts that fetches coding problems (LeetCode/Codeforces/CSES) and emails scheduled daily/weekly challenges with caching/state.",
+      "description": "Script suite that pulls LeetCode/Codeforces/CSES problems and emails daily or weekly challenges with cache/state tracking.",
       "tech": "Python + SMTP + coding-platform APIs",
       "link": "https://github.com/apricotweave91483/all/tree/main/problem_emailer"
     },
     {
       "title": "python-neofetch-dupe",
-      "description": "macfetch: neofetch-style macOS system info CLI with configurable output fields, color handling, and custom ASCII logos.",
+      "description": "macfetch: neofetch-style macOS system info CLI with configurable fields, color handling, and custom ASCII logos.",
       "tech": "Python + macOS system commands",
       "link": "https://github.com/apricotweave91483/all/tree/main/python-neofetch-dupe"
     },
     {
       "title": "transpiler",
-      "description": "Toy source-to-source transpiler that parses a small custom language and emits C code (`__out.c`).",
+      "description": "Toy transpiler that parses a small custom language and emits C code (`__out.c`).",
       "tech": "Python + C code generation",
       "link": "https://github.com/apricotweave91483/all/tree/main/transpiler"
     },
     {
       "title": "video-decomp",
-      "description": "Video decomposition tool that factorizes grayscale frames with truncated SVD, stores reduced factors on disk, and reconstructs the video output.",
+      "description": "Video decomposition tool that applies truncated SVD to grayscale frames, stores reduced factors, and reconstructs the output video.",
       "tech": "Python + NumPy + OpenCV + tqdm",
       "link": "https://github.com/apricotweave91483/all/tree/main/video-decomp"
     },
     {
       "title": "ttlx",
-      "description": "CLI utility that sends file content plus prompt instructions to Groq and writes generated LaTeX output (`.tex`) files.",
+      "description": "CLI utility that sends file content plus prompt instructions to Groq and writes generated LaTeX (`.tex`) files.",
       "tech": "Python + Groq API",
       "link": "https://github.com/apricotweave91483/all/tree/main/ttlx"
     }
