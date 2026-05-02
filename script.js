@@ -151,8 +151,6 @@
     const asciiEl = document.getElementById("ascii-name");
     if (!asciiEl) return;
 
-    const storageKey = "landingAsciiBannerV2";
-
     async function fetchManifestBannerFiles() {
       const manifestResponse = await fetch("data/ascii/manifest.json", { cache: "no-store" });
       if (!manifestResponse.ok) return null;
@@ -184,15 +182,6 @@
       return response.text();
     }
 
-    async function chosenBannerFile(validFiles) {
-      const stored = localStorage.getItem(storageKey);
-      if (stored && validFiles.includes(stored)) return stored;
-
-      const pick = validFiles[Math.floor(Math.random() * validFiles.length)];
-      localStorage.setItem(storageKey, pick);
-      return pick;
-    }
-
     try {
       const defaultBanners = Array.from({ length: 18 }, (_, i) => `ascii/name${i}.txt`);
       const bannerFiles = (await fetchManifestBannerFiles()) || defaultBanners;
@@ -201,18 +190,8 @@
       const safeBannerFiles = uniqueBannerFiles.filter((entry) => isSafeAsciiRelativePath(entry));
       if (!safeBannerFiles.length) throw new Error("missing manifest");
 
-      let fileName = await chosenBannerFile(safeBannerFiles);
-      let text;
-
-      try {
-        text = await fetchBanner(fileName);
-      } catch (_firstError) {
-        localStorage.removeItem(storageKey);
-        fileName = safeBannerFiles[Math.floor(Math.random() * safeBannerFiles.length)];
-        localStorage.setItem(storageKey, fileName);
-        text = await fetchBanner(fileName);
-      }
-
+      const fileName = safeBannerFiles[Math.floor(Math.random() * safeBannerFiles.length)];
+      const text = await fetchBanner(fileName);
       asciiEl.textContent = text.trimEnd();
     } catch (_error) {
       asciiEl.textContent = "MARIO ALEMANY";
