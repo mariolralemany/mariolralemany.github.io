@@ -2,7 +2,7 @@
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const revealStepMs = 1;
-  const charsPerStep = 3;
+  const charsPerStep = 4;
 
   function randomChar() {
     return charset[Math.floor(Math.random() * charset.length)];
