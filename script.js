@@ -56,32 +56,84 @@
     if (!queue.length) return;
 
     const start = performance.now();
+    let rafId = 0;
+    let safetyTimer = 0;
+    let finished = false;
 
-    function tick(now) {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / decryptDurationMs);
-      const nextRevealed = t >= 1 ? queue.length : Math.floor(t * queue.length);
+    function clearAnimationHandles() {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      rafId = 0;
+      if (safetyTimer) window.clearTimeout(safetyTimer);
+      safetyTimer = 0;
+    }
 
-      for (let i = 0; i < nextRevealed; i += 1) {
+    /** Always reach final text (bfcache, throttled rAF, errors, or slow frames). */
+    function finishDecrypt() {
+      if (finished) return;
+      finished = true;
+      clearAnimationHandles();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pageshow", onPageShow);
+
+      for (let i = 0; i < queue.length; i += 1) {
         const q = queue[i];
         const s = state[q.stateIndex];
         s.encrypted[q.charIndex] = s.original[q.charIndex];
       }
-
-      for (let i = nextRevealed; i < queue.length; i += 1) {
-        const q = queue[i];
-        const s = state[q.stateIndex];
-        s.encrypted[q.charIndex] = randomCharDifferentFrom(s.original[q.charIndex]);
-      }
-
       state.forEach((s) => {
         s.node.textContent = s.encrypted.join("");
       });
-
-      if (nextRevealed < queue.length) requestAnimationFrame(tick);
     }
 
-    requestAnimationFrame(tick);
+    function tick(now) {
+      if (finished) return;
+      try {
+        const elapsed = now - start;
+        const t = Math.min(1, elapsed / decryptDurationMs);
+        const nextRevealed = t >= 1 ? queue.length : Math.floor(t * queue.length);
+
+        for (let i = 0; i < nextRevealed; i += 1) {
+          const q = queue[i];
+          const s = state[q.stateIndex];
+          s.encrypted[q.charIndex] = s.original[q.charIndex];
+        }
+
+        for (let i = nextRevealed; i < queue.length; i += 1) {
+          const q = queue[i];
+          const s = state[q.stateIndex];
+          s.encrypted[q.charIndex] = randomCharDifferentFrom(s.original[q.charIndex]);
+        }
+
+        state.forEach((s) => {
+          s.node.textContent = s.encrypted.join("");
+        });
+
+        if (nextRevealed >= queue.length) {
+          finishDecrypt();
+        } else {
+          rafId = window.requestAnimationFrame(tick);
+        }
+      } catch (_err) {
+        finishDecrypt();
+      }
+    }
+
+    function onVisibilityChange() {
+      if (finished || document.visibilityState !== "visible") return;
+      if (performance.now() - start >= decryptDurationMs) finishDecrypt();
+    }
+
+    function onPageShow(ev) {
+      if (finished) return;
+      if (ev.persisted) finishDecrypt();
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pageshow", onPageShow);
+
+    safetyTimer = window.setTimeout(finishDecrypt, decryptDurationMs + 250);
+
+    rafId = window.requestAnimationFrame(tick);
   }
 
   function shuffle(items) {
