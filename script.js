@@ -2,7 +2,7 @@
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   /** Wall-clock duration from fully scrambled to fully revealed (same on every page). */
-  const decryptDurationMs = 650;
+  const decryptDurationMs = 500;
 
   function randomChar() {
     return charset[Math.floor(Math.random() * charset.length)];
