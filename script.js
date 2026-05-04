@@ -55,9 +55,11 @@
 
     if (!queue.length) return;
 
-    const start = performance.now();
+    /** Clock for progress: starts on first visible rAF so background tabs do not "expire" before any paint. */
+    let animStart = null;
     let rafId = 0;
     let safetyTimer = 0;
+    let hardCapTimer = 0;
     let finished = false;
 
     function clearAnimationHandles() {
@@ -65,6 +67,8 @@
       rafId = 0;
       if (safetyTimer) window.clearTimeout(safetyTimer);
       safetyTimer = 0;
+      if (hardCapTimer) window.clearTimeout(hardCapTimer);
+      hardCapTimer = 0;
     }
 
     /** Always reach final text (bfcache, throttled rAF, errors, or slow frames). */
@@ -88,7 +92,16 @@
     function tick(now) {
       if (finished) return;
       try {
-        const elapsed = now - start;
+        if (animStart === null) {
+          if (document.visibilityState === "hidden") {
+            rafId = window.requestAnimationFrame(tick);
+            return;
+          }
+          animStart = now;
+          safetyTimer = window.setTimeout(finishDecrypt, decryptDurationMs + 250);
+        }
+
+        const elapsed = now - animStart;
         const t = Math.min(1, elapsed / decryptDurationMs);
         const nextRevealed = t >= 1 ? queue.length : Math.floor(t * queue.length);
 
@@ -120,7 +133,8 @@
 
     function onVisibilityChange() {
       if (finished || document.visibilityState !== "visible") return;
-      if (performance.now() - start >= decryptDurationMs) finishDecrypt();
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(tick);
     }
 
     function onPageShow(ev) {
@@ -131,7 +145,7 @@
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("pageshow", onPageShow);
 
-    safetyTimer = window.setTimeout(finishDecrypt, decryptDurationMs + 250);
+    hardCapTimer = window.setTimeout(finishDecrypt, 45000);
 
     rafId = window.requestAnimationFrame(tick);
   }
