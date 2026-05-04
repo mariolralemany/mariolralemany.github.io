@@ -1,8 +1,8 @@
 (function site() {
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const revealStepMs = 1;
-  const charsPerStep = 4;
+  /** Wall-clock duration from fully scrambled to fully revealed (same on every page). */
+  const decryptDurationMs = 650;
 
   function randomChar() {
     return charset[Math.floor(Math.random() * charset.length)];
@@ -55,18 +55,20 @@
 
     if (!queue.length) return;
 
-    let revealed = 0;
-    const timer = window.setInterval(() => {
-      const next = Math.min(queue.length, revealed + charsPerStep);
+    const start = performance.now();
 
-      for (let i = revealed; i < next; i += 1) {
+    function tick(now) {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / decryptDurationMs);
+      const nextRevealed = t >= 1 ? queue.length : Math.floor(t * queue.length);
+
+      for (let i = 0; i < nextRevealed; i += 1) {
         const q = queue[i];
         const s = state[q.stateIndex];
         s.encrypted[q.charIndex] = s.original[q.charIndex];
       }
-      revealed = next;
 
-      for (let i = revealed; i < queue.length; i += 1) {
+      for (let i = nextRevealed; i < queue.length; i += 1) {
         const q = queue[i];
         const s = state[q.stateIndex];
         s.encrypted[q.charIndex] = randomCharDifferentFrom(s.original[q.charIndex]);
@@ -76,8 +78,10 @@
         s.node.textContent = s.encrypted.join("");
       });
 
-      if (revealed >= queue.length) window.clearInterval(timer);
-    }, revealStepMs);
+      if (nextRevealed < queue.length) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
   }
 
   function shuffle(items) {
