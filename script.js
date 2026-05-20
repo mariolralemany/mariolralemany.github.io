@@ -1,6 +1,6 @@
 (function site() {
   const decryptCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
-  const decryptDurationMs = 800;
+  const decryptDurationMs = 320;
   let activeDecrypt = null;
   let bootId = 0;
 
