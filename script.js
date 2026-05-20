@@ -1,15 +1,16 @@
 (function site() {
-  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  /** Wall-clock duration from fully scrambled to fully revealed (same on every page). */
-  const decryptDurationMs = 400;
+  const decryptCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>{}[]";
+  const decryptDurationMs = 800;
+  let activeDecrypt = null;
+  let bootId = 0;
 
   function randomChar() {
-    return charset[Math.floor(Math.random() * charset.length)];
+    return decryptCharset[Math.floor(Math.random() * decryptCharset.length)];
   }
 
   function randomCharDifferentFrom(target) {
     if (!target || /\s/.test(target)) return target;
+
     let next = randomChar();
     while (next === target) next = randomChar();
     return next;
@@ -19,8 +20,12 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
-        const parentTag = node.parentElement && node.parentElement.tagName;
+
+        const parent = node.parentElement;
+        const parentTag = parent && parent.tagName;
         if (parentTag === "SCRIPT" || parentTag === "STYLE") return NodeFilter.FILTER_REJECT;
+        if (parent?.closest("[data-no-decrypt]")) return NodeFilter.FILTER_REJECT;
+
         return NodeFilter.FILTER_ACCEPT;
       },
     });
@@ -32,121 +37,100 @@
   }
 
   function runGlobalDecrypt(root) {
-    if (reducedMotion) return;
+    if (activeDecrypt) activeDecrypt.finish();
 
-    const nodes = collectTextNodes(root);
     const state = [];
     const queue = [];
+    const nodes = collectTextNodes(root);
 
     nodes.forEach((node) => {
       const original = node.textContent || "";
-      const encrypted = [...original];
+      const chars = [...original];
 
-      for (let i = 0; i < encrypted.length; i += 1) {
-        if (!/\s/.test(encrypted[i])) {
-          encrypted[i] = randomCharDifferentFrom(original[i]);
-          queue.push({ stateIndex: state.length, charIndex: i });
-        }
-      }
+      chars.forEach((char, charIndex) => {
+        if (/\s/.test(char)) return;
 
-      node.textContent = encrypted.join("");
-      state.push({ node, original, encrypted });
+        chars[charIndex] = randomCharDifferentFrom(char);
+        queue.push({ stateIndex: state.length, charIndex });
+      });
+
+      node.textContent = chars.join("");
+      state.push({ node, original: [...original], chars });
     });
 
     if (!queue.length) return;
 
-    /** Clock for progress: starts on first visible rAF so background tabs do not "expire" before any paint. */
-    let animStart = null;
     let rafId = 0;
-    let safetyTimer = 0;
-    let hardCapTimer = 0;
+    let finishTimer = 0;
     let finished = false;
+    const startTime = window.performance.now();
 
-    function clearAnimationHandles() {
-      if (rafId) window.cancelAnimationFrame(rafId);
-      rafId = 0;
-      if (safetyTimer) window.clearTimeout(safetyTimer);
-      safetyTimer = 0;
-      if (hardCapTimer) window.clearTimeout(hardCapTimer);
-      hardCapTimer = 0;
+    function writeState() {
+      state.forEach((item) => {
+        item.node.textContent = item.chars.join("");
+      });
     }
 
-    /** Always reach final text (bfcache, throttled rAF, errors, or slow frames). */
-    function finishDecrypt() {
+    function cleanup() {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (finishTimer) window.clearTimeout(finishTimer);
+      rafId = 0;
+      finishTimer = 0;
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", finish);
+    }
+
+    function finish() {
       if (finished) return;
       finished = true;
-      clearAnimationHandles();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("pageshow", onPageShow);
+      cleanup();
 
-      for (let i = 0; i < queue.length; i += 1) {
-        const q = queue[i];
-        const s = state[q.stateIndex];
-        s.encrypted[q.charIndex] = s.original[q.charIndex];
-      }
-      state.forEach((s) => {
-        s.node.textContent = s.encrypted.join("");
+      queue.forEach((entry) => {
+        const item = state[entry.stateIndex];
+        item.chars[entry.charIndex] = item.original[entry.charIndex];
       });
+      writeState();
+
+      if (activeDecrypt?.finish === finish) activeDecrypt = null;
     }
 
     function tick(now) {
       if (finished) return;
+
       try {
-        if (animStart === null) {
-          if (document.visibilityState === "hidden") {
-            rafId = window.requestAnimationFrame(tick);
-            return;
-          }
-          animStart = now;
-          safetyTimer = window.setTimeout(finishDecrypt, decryptDurationMs + 250);
-        }
+        const progress = Math.min(1, (now - startTime) / decryptDurationMs);
+        const revealedCount = progress >= 1 ? queue.length : Math.floor(progress * queue.length);
 
-        const elapsed = now - animStart;
-        const t = Math.min(1, elapsed / decryptDurationMs);
-        const nextRevealed = t >= 1 ? queue.length : Math.floor(t * queue.length);
-
-        for (let i = 0; i < nextRevealed; i += 1) {
-          const q = queue[i];
-          const s = state[q.stateIndex];
-          s.encrypted[q.charIndex] = s.original[q.charIndex];
-        }
-
-        for (let i = nextRevealed; i < queue.length; i += 1) {
-          const q = queue[i];
-          const s = state[q.stateIndex];
-          s.encrypted[q.charIndex] = randomCharDifferentFrom(s.original[q.charIndex]);
-        }
-
-        state.forEach((s) => {
-          s.node.textContent = s.encrypted.join("");
+        queue.forEach((entry, index) => {
+          const item = state[entry.stateIndex];
+          item.chars[entry.charIndex] =
+            index < revealedCount
+              ? item.original[entry.charIndex]
+              : randomCharDifferentFrom(item.original[entry.charIndex]);
         });
+        writeState();
 
-        if (nextRevealed >= queue.length) {
-          finishDecrypt();
-        } else {
-          rafId = window.requestAnimationFrame(tick);
+        if (revealedCount >= queue.length) {
+          finish();
+          return;
         }
-      } catch (_err) {
-        finishDecrypt();
+
+        rafId = window.requestAnimationFrame(tick);
+      } catch (_error) {
+        finish();
       }
     }
 
     function onVisibilityChange() {
-      if (finished || document.visibilityState !== "visible") return;
-      if (rafId) return;
+      if (finished || document.visibilityState !== "visible" || rafId) return;
       rafId = window.requestAnimationFrame(tick);
     }
 
-    function onPageShow(ev) {
-      if (finished) return;
-      if (ev.persisted) finishDecrypt();
-    }
-
+    activeDecrypt = { finish };
     document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("pagehide", finish);
 
-    hardCapTimer = window.setTimeout(finishDecrypt, 45000);
-
+    finishTimer = window.setTimeout(finish, decryptDurationMs + 1000);
     rafId = window.requestAnimationFrame(tick);
   }
 
@@ -197,7 +181,7 @@
             const tech = escapeHtml(item.tech || "");
             const link = String(item.link || "").trim();
             const safeLink = /^https?:\/\//i.test(link) ? link : "#";
-            return `<li><a href="${safeLink}">${title}</a>${tech ? ` - ${tech}` : ""}</li>`;
+            return `<li><a href="${safeLink}">${title}</a>${tech ? ` <span class="project-tech">- ${tech}</span>` : ""}</li>`;
           })
           .join("");
         root.innerHTML = `<ul class="programming-list">${rows}</ul>`;
@@ -268,9 +252,18 @@
     }
   }
 
-  window.addEventListener("DOMContentLoaded", async () => {
+  async function boot() {
+    const currentBoot = ++bootId;
+
     await renderContentPage();
     await renderAsciiName();
+    if (currentBoot !== bootId) return;
+
     runGlobalDecrypt(document.body);
+  }
+
+  window.addEventListener("DOMContentLoaded", boot);
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) boot();
   });
 })();
